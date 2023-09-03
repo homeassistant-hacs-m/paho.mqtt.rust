@@ -305,37 +305,6 @@ mod build {
 
         bindings::place_bindings(&inc_dir);
 
-        // Link in the SSL libraries if configured for it.
-        if cfg!(feature = "ssl") {
-            if let Some(openssl_root_dir) = openssl_root_dir() {
-                println!("cargo:rustc-link-search={}/lib", openssl_root_dir);
-            }
-
-            // See if static SSL linkage was requested
-            let linkage = match env::var("OPENSSL_STATIC")
-                .as_ref()
-                .map(|s| s.as_str())
-            {
-                Ok("0") => "",
-                Ok(_) => "=static",
-                Err(_) => ""
-            };
-
-            let prefix = if is_msvc() { "lib" } else { "" };
-
-            println!("cargo:rustc-link-lib{}={}ssl", linkage, prefix);
-            println!("cargo:rustc-link-lib{}={}crypto", linkage, prefix);
-
-            if is_windows() {
-                if !is_msvc() {
-                    // required for mingw builds
-                    println!("cargo:rustc-link-lib{}=crypt32", linkage);
-                    println!("cargo:rustc-link-lib{}=rpcrt4", linkage);
-                }
-                println!("cargo:rustc-link-lib=User32");
-            }
-        }
-
         // we add the folder where all the libraries are built to the path search
         println!("cargo:rustc-link-search=native={}", lib_path.display());
         println!("cargo:rustc-link-lib=static={}", link_lib);
