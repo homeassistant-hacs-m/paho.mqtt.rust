@@ -34,6 +34,12 @@ use std::ptr;
 use std::fmt;
 use std::os::raw::{c_char, c_int};
 
+#[cfg(feature = "ssl")]
+mod __make_openssl_linkage_work {
+    #[allow(unused_imports)]
+    use openssl_sys::*;
+}
+
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
 // The following 'Default' trait implementations contain initializations
